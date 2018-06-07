@@ -1,0 +1,177 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "EMTErrorsLambda": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                "rodeolabz",
+                                {
+                                    "Ref": "AWS::Region"
+                                }
+                            ]
+                        ]
+                    },
+                    "S3Key": "mediatailor/emtmetrics.zip"
+                },
+                "Environment": {
+                    "Variables": {
+                        "MetricName": {
+                            "Ref": "MetricName"
+                        },
+                        "Namespace": {
+                            "Ref": "Namespace"
+                        },
+                        "CreateAlarm": {
+                            "Ref": "CreateAlarm"
+                        }
+                    }
+                },
+                "Handler": "emt_metrics.lambda_handler",
+                "MemorySize": 512,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "EMTErrorsLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.6",
+                "Timeout": 300
+            }
+        },
+        "EMTErrorsLambdaRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+                    "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
+                ],
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/"
+            }
+        },
+        "SubscriptionLambdaPermission": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:InvokeFunction",
+                "FunctionName": {
+                    "Ref": "EMTErrorsLambda"
+                },
+                "Principal": {
+                    "Fn::Join": [
+                        ".",
+                        [
+                            "logs",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "amazonaws.com"
+                        ]
+                    ]
+                }
+            }
+        },
+        "EMTSubscriptionFilter": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                "rodeolabz",
+                                {
+                                    "Ref": "AWS::Region"
+                                }
+                            ]
+                        ]
+                    },
+                    "S3Key": "mediatailor/emtsubscriptionfilter.zip"
+                },
+                "Environment": {
+                    "Variables": {
+                        "FilterPattern": {
+                            "Ref": "LogFilterPattern"
+                        },
+                        "DestinationARN": {
+                            "Fn::GetAtt": [
+                                "EMTErrorsLambda",
+                                "Arn"
+                            ]
+                        }
+                    }
+                },
+                "Handler": "subscription_filter.lambda_handler",
+                "MemorySize": 512,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "EMTErrorsLambdaRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.6",
+                "Timeout": 300
+            }
+        },
+        "SubscriptionFilterTrigger": {
+            "Type": "AWS::CloudFormation::CustomResource",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "EMTSubscriptionFilter",
+                        "Arn"
+                    ]
+                },
+                "LogGroupNames": {
+                    "Ref": "LogGroupNames"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "LogFilterPattern": {
+            "Description": "Log filter in CloudWatch filter and pattern syntax",
+            "Type": "String",
+            "Default": "{$.eventType = *ERROR*}"
+        },
+        "LogGroupNames": {
+            "Description": "Comma delimited list of Log Groups to subscribe for metric generation",
+            "Type": "CommaDelimitedList",
+            "Default": "MediaTailor/AdDecisionServerInteractions, MediaTailor/ManifestService"
+        },
+        "MetricName": {
+            "Description": "Name of the Metric to be created",
+            "Type": "String",
+            "Default": "EMT Errors"
+        },
+        "Namespace": {
+            "Description": "Namespace to put the Metric",
+            "Type": "String",
+            "Default": "Custom MediaTailor"
+        },
+        "CreateAlarm": {
+            "Description": "True of False, whether to create an alarm for each Metric dimension. If true, Alarm is created and will activate when 3 or more errors are detected in the last 15 minutes.",
+            "Type": "String",
+            "Default": "True"
+        }
+    }
+}
