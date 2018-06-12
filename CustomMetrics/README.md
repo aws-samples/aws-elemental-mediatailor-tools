@@ -176,6 +176,6 @@ The Amazon CloudWatch alarm we're going to create here will get triggered whenev
 # AWS CloudFormation
 This tutorial has been automated. An AWS CloudFormation template has been provided that will create the Lambda, IAM role needed by Lambda, subscription to Lambda, and the CloudWatch alarm. The template will **not** create the IAM role that give AWS Elemental MediaTailor access to CloudWatch (the first section in this tutorial). It assumes this step has previously been done.
 
-The template is available in the **us-east-1** region only. Copy of template and python codes can be found [here](CloudFormation).
+The template is available in the **us-east-1** region only. Copy of template and python codes can be found [here](../CloudFormation/CustomMetrics).
 
 Launch stack by clicking [here](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=MediaTailorCustomMetrics&templateURL=https://s3.amazonaws.com/rodeolabz-us-east-1/mediatailor/EMTMetrics.json).
