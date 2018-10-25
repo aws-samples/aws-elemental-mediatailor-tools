@@ -1,18 +1,17 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Creates an API Gateway that acts as a simple Ad Decision Server. Returns a different VAST XML response depending on User-Agent header.",
+    "Description": "Creates an API Gateway with CloudFront that acts as a simple Ad Decision Server. Returns a different VAST XML response depending on User-Agent header.",
     "Resources": {
         "AdServer": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
-                "Description": "Returns a different VAST response XML, depending on user-agent header",
                 "Code": {
                     "ZipFile": { "Fn::Join": ["\n", [
                         "import json",
                         "import urllib2",
                         "def handler(event, context):",
                         "   userAgent = event['headers']['User-Agent']",
-                        "   print('user-agent: ' + userAgent)",
+                        "   print('user agent: ' + userAgent)",
                         "   if \"Linux\" in userAgent:",
                         "       response = urllib2.urlopen('http://d2qohgpffhaffh.cloudfront.net/MediaTailor/VASTDemo1.xml')",
                         "   elif \"Mac OS\" in userAgent:",
@@ -234,32 +233,66 @@
             "DependsOn": [
                 "APIGatewayAcct"
             ]
+        },
+        "CloudFront": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Properties": {
+                "DistributionConfig": {
+                    "Comment": "Mock ADS",
+                    "Origins": [
+                        {
+                            "Id": "API-GW",
+                            "DomainName": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                        "Ref": "ADSGateway"
+                                        },
+                                        ".execute-api.",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        ".amazonaws.com"
+                                    ]
+                                ]
+                        },
+                            "CustomOriginConfig": {
+                                "OriginProtocolPolicy": "https-only"
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": "API-GW",
+                        "ForwardedValues": {
+                            "QueryString": "false",
+                            "Cookies": {
+                                "Forward": "none"
+                            }
+                        },
+                        "ViewerProtocolPolicy": "allow-all"
+                    }
+                }
+            }
         }
     },
     "Parameters": {},
     "Outputs": {
-        "APIGatewayURL": {
+        "AdDecisionServerURL": {
             "Value": {
                 "Fn::Join": [
-                    "",
+                    "/",
                     [
-                        "https://",
-                        {
-                            "Ref": "ADSGateway"
-                        },
-                        ".execute-api.",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        ".amazonaws.com/",
+                        {"Fn::Sub": "https://${CloudFront.DomainName}"},
                         {
                             "Ref": "ADSAPIStage"
                         },
-                        "/MyADS"
+                        "MyADS"
                     ]
                 ]
             },
-            "Description": "API Gateway Invoke URL"
+            "Description": "Ad Decision Server URL (API Gateway with CloudFront)"
         }
     }
 }
