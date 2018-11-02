@@ -6,7 +6,7 @@ This module will take you through creating a Mediatailor configuration using pre
 This module relies on the completion of the following previous modules:
 * [AWS Live Workflow  - MediaLive and MediaPackage channels with ad markers](https://aws.amazon.com/answers/media-entertainment/live-streaming/)
 * [Encrypted MediaPackage channel using the SPEKE server](https://github.com/awslabs/speke-reference-server/blob/master/workflow/drm-live.md)
-* Ad decision server (ADS). Instead of using a commercially available ADS, this workshop will use a simple, serverless mock ADS.
+* Ad decision server (ADS). Instead of using a commercially available ADS, this workshop will use a previously deployed [simple, serverless mock ADS](../MockADS). 
 
 ## Implementation Instructions
 
