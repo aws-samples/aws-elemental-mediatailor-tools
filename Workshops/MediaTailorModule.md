@@ -14,7 +14,7 @@ This module relies on the completion of the following previous modules:
 
 **Step-by-step instructions**
 
-1. From the AWS Management Console, choose **Services** then select **AWS Elemental MediaTailor**. Make sure you're in **us-west-2** region.
+1. From the AWS Management Console, choose **Services** then select **AWS Elemental MediaTailor**. Make sure you're in **eu-west-1** region.
 
 1. Click on **Create configuration**.
 
