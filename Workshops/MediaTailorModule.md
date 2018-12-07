@@ -4,9 +4,10 @@ This module will take you through creating a Mediatailor configuration using pre
 
 ## Prerequisites
 This module relies on the completion of the following previous modules:
-* [AWS Live Workflow  - MediaLive and MediaPackage channels with ad markers](https://aws.amazon.com/answers/media-entertainment/live-streaming/)
-* [Encrypted MediaPackage channel using the SPEKE server](https://github.com/awslabs/speke-reference-server/blob/master/workflow/drm-live.md)
-* Ad decision server (ADS). Instead of using a commercially available ADS, this workshop will use a previously deployed [simple, serverless mock ADS](../MockADS). 
+* Launch the [Live Streaming Solution](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=reinvent-live&templateURL=https://s3-eu-west-1.amazonaws.com/decepticons-eu-west-1/live-streaming-on-aws/reinvent/live-streaming-on-aws.yaml) - Sets up MediaLive and MediaPackage and CloudFront. Make sure to **start your MediaLive channel** once the template has been fully deployed.
+* Launch the [SPEKE reference server,](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=reinvent-live-speke&templateURL=https://s3.amazonaws.com/rodeolabz-us-east-1/speke/speke_reference.json) then follow the instructions on [encrypting your MediaPackage HLS channel](https://github.com/awslabs/speke-reference-server/blob/master/workflow/drm-live.md).
+
+You will also need an Ad decision server (ADS). For this workshop, we will use a previously deployed [simple, serverless mock ADS](../MockADS). 
 
 ## Implementation Instructions
 
