@@ -167,8 +167,8 @@ Congratulations! You've successfully integrated your streaming video with AWS El
 
 ## Cloud Resource Clean Up
 
-### AWS Elemental MediaTailor
-Select the configuration you created and hit the **Delete** button to clean up your resources.
+### CloudFormation
+Select and delete the Live Streaming and SPEKE CloudFormation templates deployed as part of the prerequisites. This will clean up all the resources created by the two templates. 
 
-### Amazon CloudFront
-Select the distribution that you created and hit the **Disable** button. Once the distribution's **State** reflects Disabled, select the same distribution and hit the **Delete** button. 
+### AWS Elemental MediaTailor
+Select the configuration you created and hit the **Delete** button to remove the configuration.
