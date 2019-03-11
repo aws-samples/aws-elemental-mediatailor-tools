@@ -1,5 +1,5 @@
-# AWS Elemental MediaTailor
-This module will take you through creating a Mediatailor configuration using previously created AWS Elemental MediaLive and AWS Elemental MediaPackage channels. 
+# Monetizing an Encrypted Live Stream with AWS Elemental MediaTailor
+This module will take you through creating a Mediatailor configuration using previously created AWS Elemental MediaLive and AWS Elemental MediaPackage channels. The MediaPackage channel will have been encrypted using a SPEKE reference server.
 	
 
 ## Prerequisites
