@@ -4,8 +4,8 @@ This module will take you through creating a Mediatailor configuration using pre
 
 ## Prerequisites
 This module relies on the completion of the following previous modules:
-* Launch and deploy the [Live Streaming Solution](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=reinvent-live&templateURL=https://s3-eu-west-1.amazonaws.com/decepticons-eu-west-1/live-streaming-on-aws/reinvent/live-streaming-on-aws.yaml) CloudFormation template - Sets up MediaLive and MediaPackage and CloudFront. Make sure to **start your MediaLive channel** once the template has been fully deployed.
-* Launch and deploy the [SPEKE reference server](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=reinvent-live-speke&templateURL=https://s3.amazonaws.com/rodeolabz-us-east-1/speke/speke_reference.json) CloudFormation template,  then follow the instructions on [encrypting your MediaPackage HLS channel](https://github.com/awslabs/speke-reference-server/blob/master/workflow/drm-live.md).
+* Launch and deploy the [Live Streaming on AWS Solution CloudFormation template](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=LiveStreaming&templateURL=https:%2F%2Fs3.amazonaws.com%2Fsolutions-reference%2Flive-streaming-on-aws%2Flatest%2Flive-streaming-on-aws.template) - Sets up MediaLive and MediaPackage and CloudFront. Make sure to **start your MediaLive channel** once the template has been fully deployed.
+* Launch and deploy the [SPEKE reference server](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=reinvent-live-speke&templateURL=https://s3.amazonaws.com/rodeolabz-us-east-1/speke/speke_reference.json) CloudFormation template,  then follow the instructions on [encrypting your MediaPackage HLS channel](https://github.com/awslabs/speke-reference-server/blob/master/workflow/drm-live.md).
 
 You will also need an Ad decision server (ADS). For this workshop, we will use a previously deployed [simple, serverless mock ADS](../MockADS). 
 
@@ -15,7 +15,7 @@ You will also need an Ad decision server (ADS). For this workshop, we will use a
 
 **Step-by-step instructions**
 
-1. From the AWS Management Console, choose **Services** then select **AWS Elemental MediaTailor**. Make sure you're in **eu-west-1** region.
+1. From the AWS Management Console, choose **Services** then select **AWS Elemental MediaTailor**. 
 
 1. Click on **Create configuration**.
 
@@ -49,9 +49,9 @@ concatenated with the **manifest filename of your MediaPackage playback endpoint
 
 	Sample full playback URL:    _https://f445cfa805184f3e8d86dc2ac1137efa.mediatailor.us-west-2.amazonaws.com/v1/master/cf6421621b389b384c1fd22e51603ee95db76ae0/MyTestConfig/index.m3u8_
 
-1. Navigate back to the demo player page that the live streaming module had deployed earlier.
+1. On a browser, navigate to [VideoJS's HLS demo player page](https://videojs.github.io/videojs-contrib-hls/).
 
-1. In the **Custom** testbox, enter the playback URL constructed above and hit Preview. If your player doesn't start automatically, hit the Play button. You should see the main content of your video play for the first 60 seconds, followed by ads for 45 seconds, and then back to video content. **Note:** You may not see ads the first time you play back if ads are not ready and are still being transcoded. 
+1. In the **Video URL** testbox, enter the playback URL constructed above and hit Load. If your player doesn't start automatically, hit the Play button. You should see the main content of your video play for the first 60 seconds, followed by ads for 45 seconds, and then back to video content. **Note:** You may not see ads the first time you play back if ads are not ready and are still being transcoded. 
 
 	![alt](Playback.png)
 
