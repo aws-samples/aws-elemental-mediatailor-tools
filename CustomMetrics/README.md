@@ -1,6 +1,6 @@
 # Creating a Custom AWS Elemental MediaTailor Metric and CloudWatch Alarm
 
-This tutorial will take you through creating a custom metric using the AWS Elemental MediaTailor log groups that have been made available in CloudWatch. There are currently two AWS Elemental MediaTailor log groups. One keeps track of Manifest related errors and another records Ad Server and AWS Elemental MediaTailor errors.  In this exercise, we create a new Amazon CloudWatch metric that tallies a count each time an error is recorded, regardless of which log group the error is written to. We will then create an Amazon CloudWatch alarm that gets triggered whenever a threshold of errors is reached in a given amount of time. This entire tutorial will be done in the **us-east-1**  region.  
+This tutorial will take you through creating a custom metric using two of the AWS Elemental MediaTailor log groups that have been made available in CloudWatch. One that keeps track of Manifest related errors (ManifestService), and another that records Ad Server and AWS Elemental MediaTailor activities(AdDecisionServerInteractions). In this exercise, we create a new Amazon CloudWatch metric that tallies a count each time an error is recorded, regardless of which log group the error is written to. We will then create an Amazon CloudWatch alarm that gets triggered whenever a threshold of errors is reached in a given amount of time. This entire tutorial will be done in the **us-east-1**  region.  
 
 Here are the high level steps we will walk through to accomplish our task above:
 1. [Create an IAM role that gives AWS Elemental MediaTailor access Amazon CloudWatch](#1-create-an-iam-role-that-gives-aws-elemental-mediatailor-access-amazon-cloudwatch)
@@ -25,6 +25,7 @@ Without doing this step, AWS Elemental MediaTailor won't be able to create and w
 ## 2. Generate AWS Elemental MediaTailor logs
 Let's verify that logs are indeed being generated and written to Amazon CloudWatch. To do this, we will create a new AWS Elemental MediaTailor configuration. First, we will provide it with a bogus origin server to generate logs in the MediaTailor/ManifestService log group. Then we will correct that, but provide the configuration with an Ad Decision Server that is unreachable. This will generate errors in the MediaTailor/AdDecisionServerInteractions log group. 
 
+### Generate a manifest service related error
 1. Navigate to the AWS Elemental MediaTailor console.
 1. Create a new configuration.
 1. Enter **TestConfigBogusAds** for **Configuration Name**.
@@ -37,11 +38,13 @@ Let's verify that logs are indeed being generated and written to Amazon CloudWat
 1. On the left hand side navigation panel, select **Logs**. 
 1. In the **Filter** search box, enter **MediaTailor** and hit enter. You should see MediaTailor/ManifestService. Click on that log group.
 1. Inside the log group, you should see a Log Stream with a prefix matching your AWS Elemental MediaTailor configuration name (**TestConfigBogusAds**). Click on that log stream. You should see the logged error message indicating the failure to reach the origin server.
+
+### Generate an ad server related error
 1. Navigate back to the AWS Elemental MediaTailor console.
 1. Edit the configuration you created. 
 1. Enter **https://cf98fa7b2ee4450e.mediapackage.us-east-1.amazonaws.com/out/v1/6477e4bc4bd84cbb895808281b1942b2** for **Video content source**. This is now the correct origin server URL.
 1. Go back to the VideoJS open source HLS player and play back the AWS Elemental MediaTailor endpoint you used earlier.
-1. Let it run long enough until it hits an ad slate. AWS Elemental MediaTailor should now succeed fetching video segments from the origin server but will fail to reach the ADS.
+1. Let it run long enough until it hits an ad avail. AWS Elemental MediaTailor should now succeed fetching video segments from the origin server but will fail to reach the ADS.
 1. Navigate back to the AWS CloudWatch console. 
 1. On the left hand side navigation panel, select **Logs**. 
 1. In the **Filter** search box, enter **MediaTailor** and hit enter. You should see MediaTailor/AdDecisionServerInteractions. Click on that log group.
