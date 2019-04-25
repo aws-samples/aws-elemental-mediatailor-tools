@@ -1,0 +1,367 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+        "EMTConfigLambda": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+                "Code": {
+                    "S3Bucket": {
+                        "Fn::Join": [
+                            "-",
+                            [
+                                "rodeolabz",
+                                {
+                                    "Ref": "AWS::Region"
+                                }
+                            ]
+                        ]
+                    },
+                    "S3Key": "mediatailor/emtconfigcdnoption.zip"
+                },
+                "Environment": {
+                    "Variables": {
+                        "ConfigName": {
+                            "Ref": "ConfigName"
+                        },
+                        "VideoSource": {
+                            "Ref": "VideoSourceURL"
+                        },
+                        "ADS": {
+                            "Ref": "ADS"
+                        },
+                        "SlateAdURL": {
+                            "Ref": "SlateAdURL"
+                        },
+                        "EnableCloudFront": {
+                            "Ref": "EnableCloudFront"
+                        }
+                    }
+                },
+                "Handler": "emtconfigcdnoption.lambda_handler",
+                "MemorySize": 1024,
+                "Role": {
+                    "Fn::GetAtt": [
+                        "EMTRole",
+                        "Arn"
+                    ]
+                },
+                "Runtime": "python3.6",
+                "Timeout": 300
+            }
+        },
+        "EMTRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess",
+                    "arn:aws:iam::aws:policy/AWSLambdaFullAccess"
+                ],
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            },
+                            "Action": [
+                                "sts:AssumeRole"
+                            ]
+                        }
+                    ]
+                },
+                "Path": "/",
+                "Policies": [
+                    {
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "mediatailor:*"
+                                    ],
+                                    "Resource": "*"
+                                }
+                            ]
+                        },
+                        "PolicyName": "EMTPolicy"
+                    }
+                ]
+            }
+        },
+        "MediaTailorConfigResource": {
+            "Type": "AWS::CloudFormation::CustomResource",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "EMTConfigLambda",
+                        "Arn"
+                    ]
+                }
+            }
+        },
+        "CloudFront": {
+            "Type": "AWS::CloudFront::Distribution",
+            "Condition": "CreateCFDistribution",
+            "Properties": {
+                "DistributionConfig": {
+                    "Comment": "CloudFront for MediaTailor",
+                    "CacheBehaviors": [
+                        {
+                            "TargetOriginId": "MediaTailor",
+                            "ViewerProtocolPolicy": "allow-all",
+                            "ForwardedValues": {
+                                "Cookies": {
+                                    "Forward": "none"
+                                },
+                                "QueryString": true
+                            },
+                            "MaxTTL": 31536000,
+                            "PathPattern": "/v1/*",
+                            "SmoothStreaming": false,
+                            "DefaultTTL": 86400,
+                            "AllowedMethods": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "CachedMethods": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "MinTTL": 0,
+                            "Compress": false
+                        },
+                        {
+                            "TargetOriginId": "Origin",
+                            "ViewerProtocolPolicy": "allow-all",
+                            "ForwardedValues": {
+                                "Cookies": {
+                                    "Forward": "none"
+                                },
+                                "QueryString": true
+                            },
+                            "MaxTTL": 31536000,
+                            "PathPattern": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        {
+                                            "Fn::GetAtt": [
+                                                "MediaTailorConfigResource",
+                                                "VideoSourcePath"
+                                            ]
+                                        },
+                                        "/*"
+                                    ]
+                                ]
+                            },
+                            "SmoothStreaming": false,
+                            "DefaultTTL": 86400,
+                            "AllowedMethods": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "MinTTL": 0,
+                            "Compress": false
+                        }
+                    ],
+                    "WebACLId": "",
+                    "Origins": [
+                        {
+                            "OriginPath": "",
+                            "CustomOriginConfig": {
+                                "OriginProtocolPolicy": "https-only",
+                                "OriginReadTimeout": 30,
+                                "HTTPPort": 80,
+                                "HTTPSPort": 443,
+                                "OriginKeepaliveTimeout": 5
+                            },
+                            "Id": "Origin",
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "MediaTailorConfigResource",
+                                    "OriginDomainName"
+                                ]
+                            }
+                        },
+                        {
+                            "OriginPath": "",
+                            "CustomOriginConfig": {
+                                "OriginProtocolPolicy": "https-only",
+                                "OriginReadTimeout": 30,
+                                "HTTPPort": 80,
+                                "HTTPSPort": 443,
+                                "OriginKeepaliveTimeout": 5
+                            },
+                            "Id": "AdvertisementService",
+                            "DomainName": {
+                                "Fn::Join": [
+                                    ".",
+                                    [
+                                        "ads",
+                                        "mediatailor",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        "amazonaws.com"
+                                    ]
+                                ]
+                            }
+                        },
+                        {
+                            "OriginPath": "",
+                            "CustomOriginConfig": {
+                                "OriginProtocolPolicy": "https-only",
+                                "OriginReadTimeout": 30,
+                                "HTTPPort": 80,
+                                "HTTPSPort": 443,
+                                "OriginKeepaliveTimeout": 5
+                            },
+                            "Id": "MediaTailor",
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "MediaTailorConfigResource",
+                                    "MediaTailorDomainName"
+                                ]
+                            }
+                        }
+                    ],
+                    "DefaultRootObject": "",
+                    "PriceClass": "PriceClass_100",
+                    "Enabled": true,
+                    "DefaultCacheBehavior": {
+                        "TargetOriginId": "AdvertisementService",
+                        "ViewerProtocolPolicy": "allow-all",
+                        "ForwardedValues": {
+                            "Cookies": {
+                                "Forward": "none"
+                            },
+                            "QueryString": true
+                        },
+                        "MaxTTL": 31536000,
+                        "SmoothStreaming": false,
+                        "DefaultTTL": 86400,
+                        "AllowedMethods": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "CachedMethods": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "MinTTL": 0,
+                        "Compress": false
+                    },
+                    "ViewerCertificate": {
+                        "CloudFrontDefaultCertificate": true
+                    },
+                    "HttpVersion": "http2"
+                }
+            }
+        },
+        "MediaTailorUpdateResource": {
+            "Type": "AWS::CloudFormation::CustomResource",
+            "Condition": "CreateCFDistribution",
+            "Properties": {
+                "ServiceToken": {
+                    "Fn::GetAtt": [
+                        "EMTConfigLambda",
+                        "Arn"
+                    ]
+                },
+                "AdSegmentUrlPrefix": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://",
+                            {
+                                "Fn::GetAtt": [
+                                    "CloudFront",
+                                    "DomainName"
+                                ]
+                            }
+                        ]
+                    ]
+                }
+            }
+        }
+    },
+    "Conditions": {
+        "CreateCFDistribution": {
+            "Fn::Equals": [
+                {
+                    "Ref": "EnableCloudFront"
+                },
+                "True"
+            ]
+        }
+    },
+    "Parameters": {
+        "ConfigName": {
+            "Description": "MediaTailor Configuration Name",
+            "Type": "String",
+            "Default": "MyEMTConfig"
+        },
+        "VideoSourceURL": {
+            "Description": "The URL for the master playlist for the HLS source stream, minus the asset ID. It's assumed that this video has ad markers.",
+            "Type": "String",
+            "Default": "https://cf98fa7b2ee4452e.mediapackage.us-east-1.amazonaws.com/out/v1/6477e4bc4bd84cbb895808281b1942b2"
+        },
+        "ADS": {
+            "Description": "The URL for the ad decision server (ADS)",
+            "Type": "String",
+            "Default": "https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=[avail.random]"
+        },
+        "SlateAdURL": {
+            "Description": " The  URL for a high-quality video asset (MP4) to transcode and use to fill in time that's not used by ads",
+            "Type": "String"
+        },
+        "EnableCloudFront": {
+            "Description": "If enabled, a new CloudFront distribution is created for MediaTailor.",
+            "Type": "String",
+            "Default": "False",
+            "AllowedValues": [
+                "True",
+                "False"
+            ]
+        }
+    },
+    "Outputs": {
+        "HLSPlaybackPrefix": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "MediaTailorConfigResource",
+                    "HLSPlaybackPrefix"
+                ]
+            },
+            "Description": "The URL that is used to initiate a playback session for devices that support Apple HLS. The session uses server-side reporting."
+        },
+        "CloudFrontPlaybackPrefix": {
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://",
+                        {
+                            "Fn::GetAtt": [
+                                "CloudFront",
+                                "DomainName"
+                            ]
+                        },
+                        {
+                            "Fn::GetAtt": [
+                                "MediaTailorUpdateResource",
+                                "HLSPlaybackPath"
+                            ]             
+                        }
+                    ]
+                ]
+            },
+            "Condition" : "CreateCFDistribution",
+            "Description": "The URL with CloudFront, that is used to initiate a playback session for devices that support Apple HLS. The session uses server-side reporting."
+        }
+    }
+}
