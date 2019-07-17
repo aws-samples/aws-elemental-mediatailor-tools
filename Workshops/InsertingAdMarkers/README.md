@@ -99,6 +99,7 @@ This step will create the necessary MediaLive and MediaPackage channels.
 			}
 			return action
 	```
+1. Make sure to replace the **channel** value with your own MediaLive channel ID. Save the Lambda.
 1. Let's test this Lambda by clicking on the **Test** button.
 1. Give the test a name like `SimpleTest` and hit the **Save** button.
 1. Select the test you just created and saved and click the **Test** button.
