@@ -1,4 +1,4 @@
-This template automates the creation of a MediaTailor configuration. It takes the following parameters:
+This [template](EMTConfigCDNOption.json) automates the creation of a MediaTailor configuration. It takes the following parameters:
 
 1. ConfigName - (required) MediaTailor configuration name
 1. VideoSourceURL - (required) The URL prefix for the master playlist for the HLS source stream, minus the asset ID

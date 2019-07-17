@@ -1,4 +1,4 @@
-The template will create the Lambda, IAM role needed by Lambda, subscription to Lambda, and the CloudWatch alarm. The template will **not** create the IAM role that give AWS Elemental MediaTailor access to CloudWatch (the first section in this tutorial). It assumes this step has been done previously. It takes the following parameters:
+The [template](EMTMetrics.json) will create the Lambda, IAM role needed by Lambda, subscription to Lambda, and the CloudWatch alarm. The template will **not** create the IAM role that give AWS Elemental MediaTailor access to CloudWatch (the first section in this tutorial). It assumes this step has been done previously. It takes the following parameters:
 
 1. LogFilterPattern - (required) Log filter in CloudWatch filter and pattern syntax
 1. LogGroupNames - (required) Comma delimited list of Log Groups to subscribe for metric generation
