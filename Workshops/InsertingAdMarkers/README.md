@@ -1,4 +1,4 @@
-# Inserting Ad Markers with AWS Elemental MediaLive for Monetization
+# Inserting Ad Markers with AWS Elemental MediaLive
 
 This module will show you how to insert ad markers into a MediaLive stream. This stream will be pushed to the AWS Elemental MediaPackage origin for HLS packaging. We will then in turn use MediaPackage's HLS endpoint as a video source to MediaTailor for monetization.
 	
