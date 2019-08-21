@@ -74,30 +74,30 @@ This step will create the necessary MediaLive and MediaPackage channels.
 			print(e)
 		return response
 	
-		# start_time = when to insert our ad
-		# offset = added to start_time to determine actual time of ad marker insertion; 
-		#           if offset is too soon, actual time to insert marker may have already passed 
-		#           by the time MediaLive receives the scheduled action and will fail
-		# event_id = splice event ID as defined in SCTE-35
-		# duration = length of ad
-		def splice_insert(start_time, offset, event_id, duration):
-			actual_start_time = start_time + datetime.timedelta(seconds=offset)
-			actual_start_time_str = actual_start_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-			action={
-				'ActionName': 'splice_insert.{}'.format(actual_start_time_str), #actionName must be unique so we append the time string
-				'ScheduleActionSettings': {
-					'Scte35SpliceInsertSettings': {
-						'SpliceEventId': event_id,
-						'Duration': duration
-					}
-				},
-				'ScheduleActionStartSettings': { 
-					'FixedModeScheduleActionStartSettings': { 
-						'Time': actual_start_time_str 
-					}
-				}    
-			}
-			return action
+	# start_time = when to insert our ad
+	# offset = added to start_time to determine actual time of ad marker insertion; 
+	#           if offset is too soon, actual time to insert marker may have already passed 
+	#           by the time MediaLive receives the scheduled action and will fail
+	# event_id = splice event ID as defined in SCTE-35
+	# duration = length of ad
+	def splice_insert(start_time, offset, event_id, duration):
+		actual_start_time = start_time + datetime.timedelta(seconds=offset)
+		actual_start_time_str = actual_start_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+		action={
+			'ActionName': 'splice_insert.{}'.format(actual_start_time_str), #actionName must be unique so we append the time string
+			'ScheduleActionSettings': {
+				'Scte35SpliceInsertSettings': {
+					'SpliceEventId': event_id,
+					'Duration': duration
+				}
+			},
+			'ScheduleActionStartSettings': { 
+				'FixedModeScheduleActionStartSettings': { 
+					'Time': actual_start_time_str 
+				}
+			}    
+		}
+		return action
 	```
 1. Make sure to replace the **channel** value with your own MediaLive channel ID. Save the Lambda.
 1. Let's test this Lambda by clicking on the **Test** button.
