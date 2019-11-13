@@ -44,7 +44,9 @@ This step will create the necessary MediaLive and MediaPackage channels.
 
 1. Choose `Python 3.7` for your runtime.
 
-1. For the execution role, choose `Use an existing role`. In the existing role dropdown, choose the role that the CloudFormation created for you named `simple-live-MediaLiveModuleS-MediaLiveResourceRole-[random-string]`.
+1. For the execution role, choose `Use an existing role`. In the existing role dropdown, choose the role that the CloudFormation created for you named `simple-live-MediaLiveModuleS-MediaLiveResourceRole-[random-string]`. 
+
+	If you've created your channels and IAM roles manually by following other tutorials, choose the IAM role you've created that gave Lambda rights to use MediaLive.
 
 	![alt](lambda_config.png)
 
